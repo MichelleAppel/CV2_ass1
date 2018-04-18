@@ -1,6 +1,13 @@
-function [R, t] = ICP()
+function [R, t] = ICP(show_iter, visualisation)
 % Input: point_clouds path
 % Example: ICP('Data/data/0000000000_normal.pcd')
+
+if nargin < 1
+   show_iter = false; 
+end
+if nargin < 2
+    visualisation = false;
+end
 
 % Read the data
 A1 = load('Data/source.mat');
@@ -8,10 +15,13 @@ A1 = A1.source.';
 A2 = load('Data/target.mat');
 A2 = A2.target.';
 
+
 % Visualize both datasets using 3d scatter plot
-figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3)), title('A1 START')
-figure, scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 START')
-    
+if visualisation
+    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3)), title('A1 START')
+    figure, scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 START')
+end
+
 % Init
 R = eye(size(A1, 2)); % Initial rotation    of 0
 t = 0;                % Initial translation of 0
@@ -25,9 +35,10 @@ counter = 0;
 % while RMS hasn't converged, update R and t
 while RMS(A1, A2, phi) <= prev_rms
     counter = counter + 1;
-    disp("Counter")
-    disp(counter)
-
+    if show_iter
+        disp("Iteration")
+        disp(counter)
+    end
     % Find the closest point in A2 for each point in A1
     [~, phi] = pdist2(A1, A2, 'euclidean', 'Smallest', 1);
     phi = phi.';
@@ -59,15 +70,17 @@ while RMS(A1, A2, phi) <= prev_rms
     t = q_ - p_ * R;
     
     prev_rms = RMS(A1, A2, phi);
-    disp(prev_rms)
+    if show_iter
+        disp("RMS:")
+        disp(prev_rms)
+    end
     A1 = A1 * R + t;
 end
 
-disp(R)
-disp(t)
-
-figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3)), title('A1 END')
-figure, scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 END')
+if visualisation
+    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3)), title('A1 END')
+    figure, scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 END')
+end
 
 end
 
