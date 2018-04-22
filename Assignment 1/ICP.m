@@ -1,36 +1,77 @@
-function [R, t] = ICP(sampling_method, show_iter, visualisation)
-% Input: point_clouds path
-% Example: ICP('Data/data/0000000000_normal.pcd')
+function [R, t] = ICP(sampling_method, N_sample, max_iter, show_iter, visualisation)
+% ICP               Iterative Closest Point algorithm.
+% Input parameters:
+% sampling_method   One of the following:
+%                   'all': use all data;
+%                   'uniform': uniform sampling before main loop;
+%                   'random-iter': random sampling at every iteration;
+%                   'informative-reg': sampling from informative regions.
+% N_sample          Num of points to sample (if sampling_method != 'all').
+% max_iter          Maximum iterations to update data (default: 1000).
+% show_iter         Boolean for showing training progress (default: false).
+% visualisation     Boolean for showing final results (default: true).
+%%% Input: point_clouds path
+%%% Example: ICP('Data/data/0000000000_normal.pcd')
+
+close all;
+clear;
+clc;
+
+% Default parameters
 if nargin < 1
-   sampling_method(sampling_method, 'all'); 
+   sampling_method = 'all'; 
 end
 if nargin < 2
-   show_iter = false; 
+    N_sample = 5000;
 end
 if nargin < 3
-    visualisation = false;
+    max_iter = 10;
+end
+if nargin < 4
+   show_iter = false; 
+end
+if nargin < 5
+    visualisation = true;
 end
 
 % Read the data
 A1 = load('Data/source.mat');
 A1 = A1.source.';
-A1 = A1(randperm(size(A1,1)),:);
+A1 = A1(randperm(size(A1,1)),:); % Shuffle the data
+A1_all = A1; % Used for 'random-iter' sub-sampling
 A2 = load('Data/target.mat');
 A2 = A2.target.';
-A2 = A2(randperm(size(A2,1)),:);
+A2 = A2(randperm(size(A2,1)),:); % Shuffle the data
+A2_all = A2; % Used for 'random-iter' sub-sampling
 
+% Check whether N_sample is valid
+if N_sample > size(A1, 1)
+    N_sample = size(A1, 1);
+    disp('N_sample was too large, set to size of A1.')
+end
+if N_sample > size(A2, 1)
+    N_sample = size(A2, 1);
+    disp('N_sample was too large, set to size of A2.') 
+end
+
+% Uniform sub-sampling
 if strcmp(sampling_method, 'uniform')
-    ind = randi([1 size(A1, 1)], 1, 1000);
+    ind = randi([1 size(A1, 1)], 1, N_sample);
     A1 = A1(ind, :);
-%     ind = randi([1 size(A2, 1)], 1, 1000);
+    ind = randi([1 size(A2, 1)], 1, N_sample);
     A2 = A2(ind, :);
+end
+
+% Sub-sampling more from informative regions 
+if strcmp(sampling_method, 'informative-reg')
+    % TODO
 end
 
 % Visualize both datasets using 3d scatter plot
 if visualisation
-    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3)), title('A1 START')
+    figure, scatter3(A1(:, 1), A1(:, 2), A1(:, 3)), title('A1 START')
     hold on
-    scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 START')
+    scatter3(A2(:, 1), A2(:, 2), A2(:, 3)), title('A2 START')
 end
 
 % Init
@@ -38,23 +79,28 @@ R = eye(size(A1, 2)); % Initial rotation    of 0
 t = 0;                % Initial translation of 0
 
 % Find the closest point in A2 for each point in A1
-[~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
-disp(phi)
-
-prev_rms = 6900000.42; % Intial RMS
+%[~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
+%prev_rms = 6900000.42; % Intial RMS
 
 counter = 0;
 % while RMS hasn't converged, update R and t
-while counter < 1
-% while RMS(A1, A2, phi) <= prev_rms
+while counter < max_iter    % while RMS(A1, A2, phi) <= prev_rms
     counter = counter + 1;
     if show_iter
         disp("Iteration")
         disp(counter)
     end
+    
+    % Random sub-sampling in each iteration
+    %if strcmp(sampling_method, 'random-iter')
+    %    ind = randi([1 size(A1_all, 1)], 1, N_sample);
+    %    A1 = A1_all(ind, :);
+    %    ind = randi([1 size(A2_all, 1)], 1, N_sample);
+    %    A2 = A2_all(ind, :);
+    %end
+
     % Find the closest point in A2 for each point in A1
     [~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
-    
     
     % Compute the weighted centroids of both point sets:
     w = ones(size(A1, 1), 1); % Set all weights to 1
@@ -91,6 +137,7 @@ while counter < 1
     
     A1 = R * A1.' + t;
     A1 = A1.';
+    
 end
 
 if visualisation
@@ -98,7 +145,6 @@ if visualisation
     hold on
     scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 END')
 end
-
 
 
 end
