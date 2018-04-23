@@ -1,4 +1,4 @@
-function [R, t] = ICP(sampling_method, N_sample, max_iter, show_iter, visualisation)
+function [opt_R, opt_t] = ICP(sampling_method, N_sample, max_iter, show_iter, visualisation)
 % ICP               Iterative Closest Point algorithm.
 % Input parameters:
 % sampling_method   One of the following:
@@ -22,7 +22,7 @@ if nargin < 1
    sampling_method = 'all'; 
 end
 if nargin < 2
-    N_sample = 5000;
+    N_sample = 2000;
 end
 if nargin < 3
     max_iter = 10;
@@ -37,12 +37,13 @@ end
 % Read the data
 A1 = load('Data/source.mat');
 A1 = A1.source.';
-A1 = A1(randperm(size(A1,1)),:); % Shuffle the data
-A1_all = A1; % Used for 'random-iter' sub-sampling
+%A1_all = A1; % Used for 'random-iter' sub-sampling
 A2 = load('Data/target.mat');
 A2 = A2.target.';
-A2 = A2(randperm(size(A2,1)),:); % Shuffle the data
-A2_all = A2; % Used for 'random-iter' sub-sampling
+%A2_all = A2; % Used for 'random-iter' sub-sampling
+
+opt_R = eye(3);
+opt_t = [0; 0; 0];
 
 % Check whether N_sample is valid
 if N_sample > size(A1, 1)
@@ -74,14 +75,6 @@ if visualisation
     scatter3(A2(:, 1), A2(:, 2), A2(:, 3)), title('A2 START')
 end
 
-% Init
-R = eye(size(A1, 2)); % Initial rotation    of 0
-t = 0;                % Initial translation of 0
-
-% Find the closest point in A2 for each point in A1
-%[~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
-%prev_rms = 6900000.42; % Intial RMS
-
 counter = 0;
 % while RMS hasn't converged, update R and t
 while counter < max_iter    % while RMS(A1, A2, phi) <= prev_rms
@@ -104,13 +97,13 @@ while counter < max_iter    % while RMS(A1, A2, phi) <= prev_rms
     
     % Compute the weighted centroids of both point sets:
     w = ones(size(A1, 1), 1); % Set all weights to 1
-    
+
     p_ = w.' * A1 / sum(w);
-    q_ = w.' * A2 / sum(w);
-    
+    q_ = w.' * A2(phi, :) / sum(w);
+   
     % Compute the centered vectors (x = y = 6400x3)
     x = A1 - p_;
-    y = A2 - q_;
+    y = A2(phi, :) - q_;
     
     % Compute the d × d covariance matrix (X = Y = 3x6400)
     X = x';
@@ -138,6 +131,9 @@ while counter < max_iter    % while RMS(A1, A2, phi) <= prev_rms
     A1 = R * A1.' + t;
     A1 = A1.';
     
+    opt_R = opt_R * R;
+    opt_t = opt_t + t;
+  
 end
 
 if visualisation
@@ -145,8 +141,7 @@ if visualisation
     hold on
     scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 END')
 end
-
-
+    
 end
 
 % Root Mean Square
