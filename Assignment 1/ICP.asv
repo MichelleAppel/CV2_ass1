@@ -19,7 +19,7 @@ if nargin < 1
    sampling_method = 'all'; 
 end
 if nargin < 2
-    N_sample = 10000;
+    N_sample = 2000;
 end
 if nargin < 3
     max_iter = 60;
@@ -74,10 +74,18 @@ if visualisation
     scatter3(A2(:, 1), A2(:, 2), A2(:, 3)), title('A2 START')
 end
 
+rms = 0;
+prev_rms = 0;
 
 counter = 0;
 % while RMS hasn't converged, update R and t
-while counter < max_iter && (counter == 0 || RMS(A1, A2, phi) <= prev_rms) % TODO: fix RMS, values are too small ?
+while counter < max_iter && (rms <= prev_rms || counter == 0)
+%     disp("whay")
+%     disp(rms)
+%     
+%     disp("what2")
+%     disp(prev_rms)
+    
    
     counter = counter + 1;
     if show_iter
@@ -86,7 +94,7 @@ while counter < max_iter && (counter == 0 || RMS(A1, A2, phi) <= prev_rms) % TOD
     end
     
     % Random sub-sampling in each iteration
-    if strcmp(sampling_method, 'random-iter') % TODO: fix, gives poor result
+    if strcmp(sampling_method, 'random-iter')
         ind = randi([1 size(A1_all, 1)], 1, N_sample);
         A1 = A1_all(ind, :);
         ind = randi([1 size(A2_all, 1)], 1, N_sample);
@@ -129,11 +137,17 @@ while counter < max_iter && (counter == 0 || RMS(A1, A2, phi) <= prev_rms) % TOD
         disp(prev_rms)
     end
     
+
+    
     A1 = R * A1.' + t;
     A1 = A1.';
     
     opt_R = opt_R * R;
     opt_t = opt_t + t;
+  
+    rms = RMS(A1, A2, phi);
+    disp("zo klein")
+    disp(RMS(A1, A2, phi))
 end
 
 % Result
