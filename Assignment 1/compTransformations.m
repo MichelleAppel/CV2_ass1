@@ -9,7 +9,7 @@ if nargin < 1
 end
 
 if nargin < 2
-    step_size = 1;
+    step_size = 2;
 end
 
 if nargin < 3
@@ -33,8 +33,7 @@ transformations = cell(length(file_names), 4);
 
 for file_no = 1:step_size:length(file_names)-1
     if print_step
-        disp("Step")
-        disp(file_no)
+        fprintf(strcat("\nStep:", string((file_no-1)/step_size + 1), "/", string(length(1:step_size:length(file_names)-1))))
     end
     
     frame1_filename = file_names(file_no,   :);

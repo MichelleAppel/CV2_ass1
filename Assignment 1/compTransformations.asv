@@ -1,4 +1,4 @@
-function [ transformations ] = mergeAll(path, print_iter)
+function [ transformations ] = compTransformations(path, step_size, print_step)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,6 +7,15 @@ addpath ./SupplementalCode/
 if nargin < 1
     path = './Data/data/';
 end
+
+if nargin < 2
+    step_size = 2;
+end
+
+if nargin < 3
+   print_step = true; 
+end
+
 
 file = fullfile(path, '*.pcd');
 d = dir(file);
@@ -22,7 +31,10 @@ end
 
 transformations = cell(length(file_names), 4);
 
-for file_no = 1:length(file_names)-1
+for file_no = 1:step_size:length(file_names)-1
+    if print_step
+        fprintf(strcat("\nStep:", string(file_no-1), "/", string(length(1:step_size:length(file_names)-1))))
+    end
     
     frame1_filename = file_names(file_no,   :);
     frame2_filename = file_names(file_no+1, :);
