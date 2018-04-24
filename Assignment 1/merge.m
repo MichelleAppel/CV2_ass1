@@ -1,4 +1,4 @@
-function [outputArg1,outputArg2] = merge(frame1, frame2)
+function [] = merge(frame1, frame2)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 addpath ./SupplementalCode
