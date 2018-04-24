@@ -1,4 +1,4 @@
-function [] = merge(frame1, frame2)
+function [ R, t ] = merge(frame1, frame2)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 addpath ./SupplementalCode
@@ -28,7 +28,7 @@ frame2 = frame2(:, frame2(3, :) < 2);
 %hold on
 %scatter3(frame2(:, 1),frame2(:, 2),frame2(:, 3)), title('frame2 END')
 
-ICP(frame1, frame2)
+[ R, t ] = ICP(frame1, frame2);
 
 
 end

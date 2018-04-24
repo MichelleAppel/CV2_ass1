@@ -1,4 +1,4 @@
-function [opt_R, opt_t] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
+function [ opt_R, opt_t ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
 % ICP               Iterative Closest Point algorithm.
 % Input parameters:
 % sampling_method   One of the following:
@@ -34,10 +34,10 @@ if nargin < 5
     max_iter = 15;
 end
 if nargin < 6
-   show_iter = true; 
+   show_iter = false; 
 end
 if nargin < 7
-    visualisation = true;
+    visualisation = false;
 end
 
 A1 = A1.';
