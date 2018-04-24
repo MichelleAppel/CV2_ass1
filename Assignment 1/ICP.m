@@ -1,4 +1,4 @@
-function [opt_R, opt_t] = ICP(sampling_method, N_sample, max_iter, show_iter, visualisation)
+function [opt_R, opt_t] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
 % ICP               Iterative Closest Point algorithm.
 % Input parameters:
 % sampling_method   One of the following:
@@ -16,29 +16,35 @@ close all;
 
 % Default parameters
 if nargin < 1
-   sampling_method = 'all'; 
+    % Read the data
+    A1 = load('Data/source.mat');
+    A1 = A1.source;
 end
 if nargin < 2
-    N_sample = 500;
+    A2 = load('Data/target.mat');
+    A2 = A2.target;
 end
 if nargin < 3
-    max_iter = 60;
+   sampling_method = 'uniform'; 
 end
 if nargin < 4
-   show_iter = true; 
+    N_sample = 6942;
 end
 if nargin < 5
+    max_iter = 15;
+end
+if nargin < 6
+   show_iter = true; 
+end
+if nargin < 7
     visualisation = true;
 end
 
-% Read the data
-A1 = load('Data/source.mat');
-A1 = A1.source.';
+A1 = A1.';
 A1_all = A1; % Used for 'random-iter' sub-sampling
-
-A2 = load('Data/target.mat');
-A2 = A2.target.';
+A2 = A2.';
 A2_all = A2; % Used for 'random-iter' sub-sampling
+
 
 % The final rotation and translation
 opt_R = eye(3);
@@ -75,7 +81,7 @@ if visualisation
 end
 
 min_rms = 1000;
-delta = 0.1;
+delta = 0.25;
 
 counter = 0;
 % while RMS hasn't converged, update R and t
@@ -149,9 +155,9 @@ A1 = A1.';
 A2 = A2_all;
 
 if visualisation
-    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3)), title('A1 END')
+    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.3, 'black'), title('A1 END')
     hold on
-    scatter3(A2(:, 1),A2(:, 2),A2(:, 3)), title('A2 END')
+    scatter3(A2(:, 1),A2(:, 2),A2(:, 3), 0.3, 'red'), title('A2 END')
 end
     
 end
