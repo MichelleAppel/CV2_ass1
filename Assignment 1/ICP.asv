@@ -74,12 +74,11 @@ if visualisation
     scatter3(A2(:, 1), A2(:, 2), A2(:, 3)), title('A2 START')
 end
 
-min_rms = 1000;
-delta = 0.1;
 
 counter = 0;
 % while RMS hasn't converged, update R and t
-while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta) % TODO: fix RMS, values are too small ?
+while counter < max_iter && (counter == 0 || RMS(A1, A2, phi) <= prev_rms) % TODO: fix RMS, values are too small ?
+    
     counter = counter + 1;
     if show_iter
         disp("Iteration")
@@ -99,7 +98,7 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
 
     % Find the closest point in A2 for each point in A1
     [~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
-
+    
     % Compute the weighted centroids of both point sets:
     w = ones(size(A1, 1), 1); % Set all weights to 1
 
@@ -128,9 +127,6 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
     t = q_.' -  R * p_.';
     
     prev_rms = RMS(A1, A2, phi);
-    if prev_rms < min_rms
-       min_rms = prev_rms; 
-    end
     if show_iter
         disp("RMS:")
         disp(prev_rms)
