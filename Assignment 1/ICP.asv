@@ -1,4 +1,4 @@
-function [ opt_trans ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
+function [ opt_R, opt_t ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
 % ICP               Iterative Closest Point algorithm.
 % Input parameters:
 % sampling_method   One of the following:
@@ -28,7 +28,7 @@ if nargin < 3
    sampling_method = 'uniform'; 
 end
 if nargin < 4
-    N_sample = 1000;
+    N_sample = 6000;
 end
 if nargin < 5
     max_iter = 100;
@@ -37,7 +37,7 @@ if nargin < 6
    show_iter = false; 
 end
 if nargin < 7
-    visualisation = false;
+    visualisation = true;
 end
 
 A1 = A1.';
@@ -46,7 +46,10 @@ A2 = A2.';
 A2_all = A2; % Used for 'random-iter' sub-sampling
 
 
-% The final transformation
+% The final rotation and translation
+opt_R = eye(3);
+opt_t = zeros(3, 1);
+
 opt_trans = eye(4);
 
 % Check whether N_sample is valid
@@ -144,15 +147,21 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
     A1 = R * A1.' + t;
     A1 = A1.';
     
-    trans = eye(4);
-    trans(1:3, 1:3) = R;
-    trans(1:3, 4) = t;
-    opt_trans = trans * opt_trans;
+    trans = eye(4)
+    trans
     
+    opt_R = R * opt_R;
+    opt_t = opt_t + R * t;
 end
 
-A1_all(:, 4) = ones(size(A1_all, 1), 1);
-A1 = opt_trans * A1_all.';
+if visualisation
+    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.8), title('A1 END')
+    hold on
+    scatter3(A2(:, 1),A2(:, 2),A2(:, 3), 0.8), title('A2 END')
+end
+
+% Result
+A1 = opt_R * A1_all.' + opt_t;
 A1 = A1.';
 A2 = A2_all;
 
