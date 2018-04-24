@@ -19,7 +19,7 @@ if nargin < 1
    sampling_method = 'all'; 
 end
 if nargin < 2
-    N_sample = 10000;
+    N_sample = 500;
 end
 if nargin < 3
     max_iter = 60;
@@ -89,6 +89,9 @@ while counter < max_iter && (counter == 0 || RMS(A1, A2, phi) <= prev_rms) % TOD
     if strcmp(sampling_method, 'random-iter') % TODO: fix, gives poor result
         ind = randi([1 size(A1_all, 1)], 1, N_sample);
         A1 = A1_all(ind, :);
+        A1 = opt_R * A1.' + opt_t;
+        A1 = A1.';
+        
         ind = randi([1 size(A2_all, 1)], 1, N_sample);
         A2 = A2_all(ind, :);
     end
