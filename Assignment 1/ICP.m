@@ -12,7 +12,7 @@ function [ opt_trans ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_i
 % visualisation     Boolean for showing final results (default: true).
 
 % Close all current figures
-close all;
+% close all;
 
 % Default parameters
 if nargin < 1
@@ -28,7 +28,7 @@ if nargin < 3
    sampling_method = 'uniform'; 
 end
 if nargin < 4
-    N_sample = 1000;
+    N_sample = 4000;
 end
 if nargin < 5
     max_iter = 100;
@@ -37,7 +37,7 @@ if nargin < 6
    show_iter = false; 
 end
 if nargin < 7
-    visualisation = false;
+    visualisation = true;
 end
 
 A1 = A1.';

@@ -1,6 +1,4 @@
-function [ transformations ] = comp_transformations(path, step_size, print_step)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+function [ complete_point_cloud ] = cumulative_merge()
 
 addpath ./SupplementalCode/
 
@@ -8,7 +6,7 @@ if nargin < 1
     path = './Data/data/';
 end
 if nargin < 2
-    step_size = 3;
+    step_size = 5;
 end
 if nargin < 3
    print_step = true; 
@@ -18,16 +16,18 @@ file_names = get_file_names(path);
 
 transformations = cell(length(1:step_size:length(file_names)-step_size), 3);
 
+frame1 = readPcd(file_names(1, :));
+frame1 = frame1(:, 1:3).';
+complete_point_cloud = frame1;
+
 for file_no = 1:step_size:length(file_names)-step_size
     if print_step
         fprintf(strcat("\nStep:", string((file_no-1)/step_size + 1), "/", string(length(1:step_size:length(file_names)-1))))
     end
-    
-    frame1_filename = file_names(file_no,           :);
+
     frame2_filename = file_names(file_no+step_size, :);
     
-    frame1 = readPcd(frame1_filename);
-    frame1 = frame1(:, 1:3).';
+    frame1 = complete_point_cloud;
     
     frame2 = readPcd(frame2_filename);
     frame2 = frame2(:, 1:3).';
@@ -36,9 +36,21 @@ for file_no = 1:step_size:length(file_names)-step_size
     transformations{(file_no-1)/step_size + 1, 1} = num2cell(transformation);
     transformations{(file_no-1)/step_size + 1, 2} = num2cell(file_no);
     transformations{(file_no-1)/step_size + 1, 3} = num2cell(file_no+step_size);
+    
+
+    frame1(4, :) = ones(size(frame1, 2), 1);
+    tframe1 = transformation * frame1;
+    tframe1 = tframe1(1:3, :);
+    
+
+     
+%     complete_point_cloud(:, end:end+size(tframe2, 2)) = tframe2;
+    complete_point_cloud = [tframe1, frame2];
+    
 end
 
-save('Output/transformations.mat', 'transformations');
+save('Output/transformations_cum.mat', 'transformations');
+
 
 end
 
