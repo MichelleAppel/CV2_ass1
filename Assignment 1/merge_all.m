@@ -2,6 +2,8 @@ function [ transformed_frames ] = merge_all(path, transformations, visualisation
 %UNTITLED5 Summary of this function goes here
 %   Detailed explanation goes here
 
+addpath ./SupplementalCode/
+
 if nargin < 1
     path = './Data/data/';
 end
@@ -35,7 +37,7 @@ for i = length(transformations):-1:1
     global_transformation = transformation * global_transformation;
 
     frame(4, :) = ones(size(frame, 2), 1);
-    tframe = transformation * frame;
+    tframe = global_transformation * frame;
     transformed_frames{i} = num2cell(tframe);
     
 end

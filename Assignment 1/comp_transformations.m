@@ -9,7 +9,7 @@ if nargin < 1
 end
 
 if nargin < 2
-    step_size = 1;
+    step_size = 5;
 end
 
 if nargin < 3
