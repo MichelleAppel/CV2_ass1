@@ -38,7 +38,8 @@ for file_no = 1:step_size:length(file_names)-step_size
     transformations{(file_no-1)/step_size + 1, 3} = num2cell(file_no+step_size);
 end
 
-save('Output/transformations.mat', 'transformations');
+file_name = strcat('Output/transformations_step_', num2str(step_size), '.mat');
+save(file_name, 'transformations');
 
 end
 
