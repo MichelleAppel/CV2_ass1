@@ -13,8 +13,8 @@ if nargin < 2
 end
 
 % Remove background
-frame1 = frame1(:, frame1(3, :) < 2);
-frame2 = frame2(:, frame2(3, :) < 2);
+frame1 = frame1(:, frame1(3, :) < 1.42);
+frame2 = frame2(:, frame2(3, :) < 1.42);
 
 [ transformation ] = ICP(frame1, frame2);
 

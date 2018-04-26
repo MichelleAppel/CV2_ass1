@@ -28,7 +28,7 @@ if nargin < 3
    sampling_method = 'uniform'; 
 end
 if nargin < 4
-    N_sample = 4000;
+    N_sample = 5000;
 end
 if nargin < 5
     max_iter = 100;
@@ -37,7 +37,7 @@ if nargin < 6
    show_iter = false; 
 end
 if nargin < 7
-    visualisation = true;
+    visualisation = false;
 end
 
 A1 = A1.';
@@ -74,9 +74,9 @@ end
 
 % Visualize both datasets using 3d scatter plot
 if visualisation
-    figure, scatter3(A1(:, 1), A1(:, 2), A1(:, 3)), title('A1 START')
+    figure, scatter3(A1_all(:, 1), A1_all(:, 2), A1_all(:, 3), 0.8), title('START')
     hold on
-    scatter3(A2(:, 1), A2(:, 2), A2(:, 3)), title('A2 START')
+    scatter3(A2_all(:, 1), A2_all(:, 2), A2_all(:, 3), 0.8)
 end
 
 min_rms = 1000;
@@ -157,9 +157,9 @@ A1 = A1.';
 A2 = A2_all;
 
 if visualisation
-    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.8), title('A1 END')
+    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.8), title(strcat('END, #points:', string(size(A1, 1))))
     hold on
-    scatter3(A2(:, 1),A2(:, 2),A2(:, 3), 0.8), title('A2 END')
+    scatter3(A2(:, 1),A2(:, 2),A2(:, 3), 0.8)
 end
     
 end

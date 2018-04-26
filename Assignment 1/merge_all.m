@@ -8,7 +8,7 @@ if nargin < 1
     path = './Data/data/';
 end
 if nargin < 2
-   t = load('Output/transformations.mat');
+   t = load('Output/transformations_step_1.mat');
    transformations = t.transformations;
 end
 if nargin < 3

@@ -6,7 +6,7 @@ if nargin < 1
     path = './Data/data/';
 end
 if nargin < 2
-    step_size = 2;
+    step_size = 5;
 end
 if nargin < 3
    print_step = true; 
@@ -25,7 +25,6 @@ for file_no = 1:step_size:length(file_names)-step_size
     if print_step
         fprintf(strcat("\nStep:", string((file_no-1)/step_size + 1), "/", string(length(1:step_size:length(file_names)-1))))
     end
-    
     frame1 = complete_point_cloud;
     
     frame2_filename = file_names(file_no+step_size, :);
@@ -34,18 +33,19 @@ for file_no = 1:step_size:length(file_names)-step_size
 
     [ transformation ] = merge(frame1, frame2);
    
+
     frame1(4, :) = ones(size(frame1, 2), 1);
     tframe1 = transformation * frame1;
     tframe1 = tframe1(1:3, :);
     
-    complete_point_cloud = [tframe1, frame2];
-    complete_point_cloud = complete_point_cloud(:, complete_point_cloud(3, :) < 1.42);
-    
-    
+
+     
 %     complete_point_cloud(:, end:end+size(tframe2, 2)) = tframe2;
 %     complete_point_cloud = [tframe1, frame2];
     
 end
+
+save('Output/transformations_cum.mat', 'transformations');
 
 if visualize
     complete_point_cloud = complete_point_cloud.';
