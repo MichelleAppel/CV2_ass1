@@ -1,4 +1,4 @@
-function [ opt_trans ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
+function [ opt_trans, full_rms, conv_iter ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation)
 % ICP               Iterative Closest Point algorithm.
 % Input parameters:
 % sampling_method   One of the following:
@@ -13,8 +13,6 @@ function [ opt_trans ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_i
 
 % Close all current figures
 close all;
-clear;
-clc;
 
 % Default parameters
 if nargin < 1
@@ -36,7 +34,7 @@ if nargin < 5
     max_iter = 100;
 end
 if nargin < 6
-   show_iter = true; 
+   show_iter = false; 
 end
 if nargin < 7
     visualisation = true;
@@ -89,8 +87,7 @@ if visualisation
 end
 
 min_rms = 1000;
-delta = 0.25; 
-
+delta = 0.25;
 counter = 0;
 % while RMS hasn't converged, update R and t
 while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta) % TODO: fix RMS, values are too small ?
@@ -112,7 +109,6 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
         A2 = A2_all(ind, :);
     end
 
-    size(A1)
     % Find the closest point in A2 for each point in A1
     [~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
 
@@ -189,8 +185,6 @@ if visualisation
         {', Num points sampled:'},{' '},{num2str(N_sample)},{'/'},{num2str(size(A1, 1))},{','});
     second = strcat({'RMS:'},{' '},{num2str(full_rms)}, ...
         {', Iterations untill convergence:'},{' '},{num2str(conv_iter)});
-    disp(first)
-    disp(second)
     figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.8), title({string(first),string(second)});
     hold on
     scatter3(A2(:, 1),A2(:, 2),A2(:, 3), 0.8)
