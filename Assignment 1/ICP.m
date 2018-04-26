@@ -12,7 +12,9 @@ function [ opt_trans ] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_i
 % visualisation     Boolean for showing final results (default: true).
 
 % Close all current figures
-% close all;
+close all;
+clear;
+clc;
 
 % Default parameters
 if nargin < 1
@@ -25,26 +27,29 @@ if nargin < 2
     A2 = A2.target;
 end
 if nargin < 3
-   sampling_method = 'uniform'; 
+   sampling_method = 'random-iter'; 
 end
 if nargin < 4
-    N_sample = 5000;
+    N_sample = 1000;
 end
 if nargin < 5
     max_iter = 100;
 end
 if nargin < 6
-   show_iter = false; 
+   show_iter = true; 
 end
 if nargin < 7
-    visualisation = false;
+    visualisation = true;
+end
+
+if strcmp(sampling_method, 'all')
+    N_sample = size(A1, 2);
 end
 
 A1 = A1.';
 A1_all = A1; % Used for 'random-iter' sub-sampling
 A2 = A2.';
 A2_all = A2; % Used for 'random-iter' sub-sampling
-
 
 % The final transformation
 opt_trans = eye(4);
@@ -72,15 +77,19 @@ if strcmp(sampling_method, 'informative-reg')
     % TODO
 end
 
+% Calculate RMS of full point cloud
+[~, phi] = pdist2(A2_all, A1_all, 'euclidean', 'Smallest', 1);
+init_rms = RMS(A1_all, A2_all, phi);
+
 % Visualize both datasets using 3d scatter plot
 if visualisation
-    figure, scatter3(A1_all(:, 1), A1_all(:, 2), A1_all(:, 3), 0.8), title('START')
+    figure, scatter3(A1_all(:, 1), A1_all(:, 2), A1_all(:, 3), 0.8), title(strcat({'Init RMS:'},{' '},{num2str(init_rms)}))
     hold on
     scatter3(A2_all(:, 1), A2_all(:, 2), A2_all(:, 3), 0.8)
 end
 
 min_rms = 1000;
-delta = 0.25;
+delta = 0.25; 
 
 counter = 0;
 % while RMS hasn't converged, update R and t
@@ -95,13 +104,15 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
     if strcmp(sampling_method, 'random-iter') % TODO: fix, gives poor result
         ind = randi([1 size(A1_all, 1)], 1, N_sample);
         A1 = A1_all(ind, :);
-        A1 = opt_R * A1.' + opt_t;
+        A1(:, 4) = ones(size(A1, 1), 1);
+        A1 = opt_trans * A1.';
         A1 = A1.';
-        
+        A1 = A1(:, 1:3);
         ind = randi([1 size(A2_all, 1)], 1, N_sample);
         A2 = A2_all(ind, :);
     end
 
+    size(A1)
     % Find the closest point in A2 for each point in A1
     [~, phi] = pdist2(A2, A1, 'euclidean', 'Smallest', 1);
 
@@ -134,7 +145,9 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
     
     prev_rms = RMS(A1, A2, phi);
     if prev_rms < min_rms
-       min_rms = prev_rms; 
+       min_rms = prev_rms;
+       optimal_transformation = opt_trans;
+       conv_iter = counter;
     end
     if show_iter
         disp("RMS:")
@@ -152,16 +165,37 @@ while counter < max_iter && (counter == 0 || prev_rms <= min_rms + min_rms*delta
 end
 
 A1_all(:, 4) = ones(size(A1_all, 1), 1);
-A1 = opt_trans * A1_all.';
+%A1 = opt_trans * A1_all.';
+A1 = optimal_transformation * A1_all.';
 A1 = A1.';
 A2 = A2_all;
 
+% Calculate RMS of full point cloud
+A1_all = A1(:, 1:3);
+[~, phi] = pdist2(A2_all, A1_all, 'euclidean', 'Smallest', 1);
+full_rms = RMS(A1_all, A2_all, phi);
+    
+if show_iter
+    disp('Minimal RMS during covergence:')
+    disp(min_rms)
+    disp('Amount of iterations until convergence:')
+    disp(conv_iter)
+    disp('RMS of full point cloud:')
+    disp(full_rms)
+end
+
 if visualisation
-    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.8), title(strcat('END, #points:', string(size(A1, 1))))
+    first = strcat({'Sampling method:'},{' '},{sampling_method}, ...
+        {', Num points sampled:'},{' '},{num2str(N_sample)},{'/'},{num2str(size(A1, 1))},{','});
+    second = strcat({'RMS:'},{' '},{num2str(full_rms)}, ...
+        {', Iterations untill convergence:'},{' '},{num2str(conv_iter)});
+    disp(first)
+    disp(second)
+    figure, scatter3(A1(:, 1),A1(:, 2),A1(:, 3), 0.8), title({string(first),string(second)});
     hold on
     scatter3(A2(:, 1),A2(:, 2),A2(:, 3), 0.8)
 end
-    
+
 end
 
 % Root Mean Square
