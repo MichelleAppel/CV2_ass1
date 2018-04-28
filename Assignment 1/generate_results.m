@@ -2,10 +2,10 @@ function [avg_rms, avg_conv_iter] = generate_results(sampling_method, N_runs, ..
     A1, A2, N_sample, max_iter, show_iter, visualisation)
 
 if nargin < 1
-    sampling_method = 'uniform';
+    sampling_method = 'random-iter';
 end
 if nargin < 2
-    N_runs = 100;
+    N_runs = 1;
 end
 if nargin < 3
     % Read the data
@@ -17,7 +17,7 @@ if nargin < 4
     A2 = A2.target;
 end
 if nargin < 5
-    N_sample = 6400;
+    N_sample = 100;
 end
 if nargin < 6
     max_iter = 100;
@@ -26,7 +26,7 @@ if nargin < 7
    show_iter = false; 
 end
 if nargin < 8
-    visualisation = false;
+    visualisation = true;
 end
 
 avg_rms = 0;
