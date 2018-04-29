@@ -1,5 +1,8 @@
 function [avg_rms, avg_conv_iter] = generate_results(sampling_method, N_runs, ...
     A1, A2, N_sample, max_iter, show_iter, visualisation)
+% Generate results for given method, for the random subsampling methods,
+% run ICP 100 times and calculate average lowest RMS error and 
+% average iterations for convergence.
 
 if nargin < 1
     sampling_method = 'random-iter';
