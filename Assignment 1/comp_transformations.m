@@ -7,7 +7,7 @@ if nargin < 1
     path = './Data/data/';
 end
 if nargin < 2
-    step_size = 10;
+    step_size = 1;
 end
 if nargin < 3
    print_step = true; 
@@ -16,7 +16,7 @@ if nargin < 4
    sampling_method = 'uniform'; 
 end
 if nargin < 5
-    N_sample = 100;
+    N_sample = 1000;
 end
 
 file_names = get_file_names(path);
