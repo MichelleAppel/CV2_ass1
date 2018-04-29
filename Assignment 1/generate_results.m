@@ -20,7 +20,7 @@ if nargin < 4
     A2 = A2.target;
 end
 if nargin < 5
-    N_sample = 100;
+    N_sample = 6400;
 end
 if nargin < 6
     max_iter = 1000;
@@ -35,6 +35,7 @@ end
 avg_rms = 0;
 avg_conv_iter = 0;
 for i = 1:N_runs
+    disp(i)
     [ ~, min_rms, conv_iter] = ICP(A1, A2, sampling_method, N_sample, max_iter, show_iter, visualisation);
     avg_rms = avg_rms + min_rms;
     avg_conv_iter = avg_conv_iter + conv_iter;

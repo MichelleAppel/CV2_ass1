@@ -11,10 +11,10 @@ if nargin < 2
     frame2 = frame2(:, 1:3).';
 end
 if nargin < 3
-   sampling_method = 'informative-reg'; 
+   sampling_method = 'uniform'; 
 end
 if nargin < 4
-    N_sample = 1000;
+    N_sample = 100;
 end
 
 % Remove background

@@ -25,10 +25,10 @@ if nargin < 2
     A2 = A2.target;
 end
 if nargin < 3
-   sampling_method = 'informative-reg'; 
+   sampling_method = 'uniform'; 
 end
 if nargin < 4
-    N_sample = 1000;
+    N_sample = 100;
 end
 if nargin < 5
     max_iter = 100;
@@ -37,7 +37,7 @@ if nargin < 6
    show_iter = false; 
 end
 if nargin < 7
-    visualisation = true;
+    visualisation = false;
 end
 
 if strcmp(sampling_method, 'all')
