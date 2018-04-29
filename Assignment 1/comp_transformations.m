@@ -7,17 +7,19 @@ if nargin < 1
     path = './Data/data/';
 end
 if nargin < 2
-    step_size = 1;
+    step_size = 10;
 end
 if nargin < 3
    print_step = true; 
 end
 if nargin < 4
-   sampling_method = 'uniform'; 
+   sampling_method = 'random-iter'; 
 end
 if nargin < 5
-    N_sample = 1000;
+    N_sample = 5000;
 end
+
+% todo: uniform, step_size 1
 
 file_names = get_file_names(path);
 
