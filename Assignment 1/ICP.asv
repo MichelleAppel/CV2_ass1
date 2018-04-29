@@ -72,10 +72,9 @@ end
 
 % Sub-sampling more from informative regions 
 if strcmp(sampling_method, 'informative-reg')
-    K = 200; % Amount of clusters
-    
-    [ IDXA1, ~ ] = kmeans(A1, K, 'MaxIter', 500); % Perform k-means
-    [ IDXA2, ~ ] = kmeans(A2, K, 'MaxIter', 500); % Perform k-means
+    K = 100; % Amount of clusters
+    [ IDXA1, ~ ] = kmeans(A1, K); % Perform k-means
+    [ IDXA2, ~ ] = kmeans(A2, K); % Perform k-means
     [ a1, ~ ] = histc(IDXA1,unique(IDXA1)); % Count number of points assigned to clusters
     [ a2, ~ ] = histc(IDXA2,unique(IDXA2)); % Count number of points assigned to clusters
     
@@ -90,17 +89,22 @@ if strcmp(sampling_method, 'informative-reg')
     z2(:, 2) = unique(IDXA2);
     z2 = flipud(sortrows(z2));
    
-    disp(z1)
-    disp(z2)
-    
     % Clusters that have less than these amount of points are not
     % informative
     informative_limit = round(0.01 * size(A1, 1));
     z1 = z1(z1(:, 1) > informative_limit, :);
     z2 = z2(z2(:, 1) > informative_limit, :);
     
+    size(A1)
+    
+%     A1 = A1(ismember(IDXA1, z1(:,2)), :);
+%     A2 = A2(ismember(IDXA2, z2(:,2)), :);    
+
     A1 = A1(ismember(IDXA1, z1(:,2)), :);
     A2 = A2(ismember(IDXA2, z2(:,2)), :);    
+
+
+    size(A1)
 end
 
 if visualisation
