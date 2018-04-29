@@ -72,42 +72,19 @@ end
 
 % Sub-sampling more from informative regions 
 if strcmp(sampling_method, 'informative-reg')
-    K = 200; % Amount of clusters
     
-    [ IDXA1, ~ ] = kmeans(A1, K, 'MaxIter', 500); % Perform k-means
-    [ IDXA2, ~ ] = kmeans(A2, K, 'MaxIter', 500); % Perform k-means
-    [ a1, ~ ] = histc(IDXA1,unique(IDXA1)); % Count number of points assigned to clusters
-    [ a2, ~ ] = histc(IDXA2,unique(IDXA2)); % Count number of points assigned to clusters
-    
-    % Sort according to amount of points that belong to a cluster
-    z1 = zeros(size(a1, 1), 2);
-    z1(:, 1) = a1;
-    z1(:, 2) = unique(IDXA1);
-    z1 = flipud(sortrows(z1)); 
-     
-    z2 = zeros(size(a2, 1), 2);
-    z2(:, 1) = a2;
-    z2(:, 2) = unique(IDXA2);
-    z2 = flipud(sortrows(z2));
-   
-    disp(z1)
-    disp(z2)
-    
-    % Clusters that have less than these amount of points are not
-    % informative
-    informative_limit = round(0.01 * size(A1, 1));
-    z1 = z1(z1(:, 1) > informative_limit, :);
-    z2 = z2(z2(:, 1) > informative_limit, :);
-    
-    A1 = A1(ismember(IDXA1, z1(:,2)), :);
-    A2 = A2(ismember(IDXA2, z2(:,2)), :);    
+    [ ~, A1 ] = kmeans(A1, N_sample, 'MaxIter', 500); % Perform k-means
+    [ ~, A2 ] = kmeans(A2, N_sample, 'MaxIter', 500); % Perform k-means
+
+    if visualisation
+        figure, scatter3(A1(:, 1), A1(:, 2), A1(:, 3), 0.8), title('Informative regions')
+        hold on
+        scatter3(A2(:, 1), A2(:, 2), A2(:, 3), 0.8)
+    end
+
 end
 
-if visualisation
-    figure, scatter3(A1(:, 1), A1(:, 2), A1(:, 3), 0.8), title(strcat({'Init RMS:'},{' '},{num2str(1)}))
-    hold on
-    scatter3(A2(:, 1), A2(:, 2), A2(:, 3), 0.8)
-end
+
 
 % Calculate RMS of full point cloud
 [~, phi] = pdist2(A2_all, A1_all, 'euclidean', 'Smallest', 1);

@@ -5,7 +5,7 @@ function [avg_rms, avg_conv_iter] = generate_results(sampling_method, N_runs, ..
 % average iterations for convergence.
 
 if nargin < 1
-    sampling_method = 'random-iter';
+    sampling_method = 'informative-reg';
 end
 if nargin < 2
     N_runs = 1;
@@ -23,7 +23,7 @@ if nargin < 5
     N_sample = 100;
 end
 if nargin < 6
-    max_iter = 100;
+    max_iter = 1000;
 end
 if nargin < 7
    show_iter = false; 
